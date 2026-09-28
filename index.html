@@ -3,35 +3,284 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Brandora - Imported Store</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f4f4f4; text-align: center; }
-        header { background: #333; color: #fff; padding: 20px; }
-        .container { padding: 20px; display: flex; justify-content: center; flex-wrap: wrap; gap: 20px; }
-        .product-card { background: #fff; border: 1px solid #ddd; padding: 15px; width: 250px; border-radius: 5px; box-shadow: 2px 2px 5px rgba(0,0,0,0.1); }
-        .product-card h3 { margin: 10px 0; color: #333; }
-        .product-card p { color: #666; font-size: 14px; }
-        .price { color: #b12704; font-weight: bold; font-size: 18px; margin: 10px 0; }
-        .whatsapp-btn { background: #25D366; color: white; padding: 10px 15px; text-decoration: none; border-radius: 5px; display: inline-block; font-weight: bold; margin-top: 10px; }
-        .whatsapp-btn:hover { background: #1ebe5d; }
-    </style>
+    <title>VOGUE EXOTIC | Premium Imported Apparel & Home Goods</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <header>
-        <h1>Brandora</h1>
-        <p>Imported Clothing & Fashion Store in Pakistan</p>
+    <!-- Announcement Bar -->
+    <div class="announcement-bar">
+        <p><i class="fa-solid fa-truck-fast"></i> Nationwide Cash on Delivery Available Across Pakistan | Free Shipping on Orders Over Rs. 5,000</p>
+    </div>
+
+    <!-- Header & Navigation -->
+    <header class="header">
+        <div class="nav-container">
+            <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Toggle Menu">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+            
+            <a href="#" class="logo">VOGUE<span>EXOTIC</span></a>
+
+            <nav class="nav-menu" id="navMenu">
+                <button class="close-menu-btn" id="closeMenuBtn"><i class="fa-solid fa-xmark"></i></button>
+                <a href="#home" class="nav-link active">Home</a>
+                <a href="#shop" class="nav-link">Shop</a>
+                <a href="#shop" class="nav-link" data-filter="T-Shirts">T-Shirts</a>
+                <a href="#shop" class="nav-link" data-filter="Trousers">Trousers</a>
+                <a href="#shop" class="nav-link" data-filter="Jackets">Jackets</a>
+                <a href="#shop" class="nav-link" data-filter="Blankets">Blankets</a>
+                <a href="#shop" class="nav-link" data-filter="Branded Items">Branded Items</a>
+                <a href="#about" class="nav-link">About</a>
+                <a href="#contact" class="nav-link">Contact</a>
+            </nav>
+
+            <div class="header-actions">
+                <button class="icon-btn cart-btn" id="cartBtn" aria-label="Shopping Cart">
+                    <i class="fa-solid fa-bag-shopping"></i>
+                    <span class="cart-badge" id="cartBadge">0</span>
+                </button>
+            </div>
+        </div>
     </header>
 
-    <div class="container">
-        <!-- Product 1 -->
-        <div class="product-card">
-            <h3>Imported Item 1</h3>
-            <p>Behtareen quality ka imported maal.</p>
-            <div class="price">Rs. 2,500</div>
-            <a class="whatsapp-btn" href="https://wa.me/923XXXXXXXXX?text=Hello,%20main%20yeh%20Imported%20Item%201%20kharidna%20chahta%20hoon." target="_blank">Order on WhatsApp</a>
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <div class="hero-content">
+            <span class="hero-badge">NEW IMPORTED COLLECTION 2026</span>
+            <h1>Elevate Your Style With Global Fashion</h1>
+            <p>Discover hand-picked imported pre-owned streetwear, luxury apparel, and heavy woven tapestry blankets delivered straight to your doorstep in Pakistan.</p>
+            <div class="hero-buttons">
+                <a href="#shop" class="btn btn-primary">Shop Now</a>
+                <a href="https://wa.me/YOUR_WHATSAPP_NUMBER?text=Hi,%20I%20want%20to%20inquire%20about%20your%20imported%20collection." target="_blank" class="btn btn-whatsapp">
+                    <i class="fa-brands fa-whatsapp"></i> Chat on WhatsApp
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Trust Badges Section -->
+    <section class="trust-section">
+        <div class="trust-grid">
+            <div class="trust-item">
+                <i class="fa-solid fa-money-bill-wave"></i>
+                <div>
+                    <h3>Cash on Delivery</h3>
+                    <p>Pay safely when your order arrives</p>
+                </div>
+            </div>
+            <div class="trust-item">
+                <i class="fa-solid fa-globe"></i>
+                <div>
+                    <h3>100% Imported Quality</h3>
+                    <p>Hand-inspected vintage & branded goods</p>
+                </div>
+            </div>
+            <div class="trust-item">
+                <i class="fa-solid fa-headset"></i>
+                <div>
+                    <h3>WhatsApp Support</h3>
+                    <p>Quick assistance & direct ordering</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Shop Section -->
+    <section class="shop-section" id="shop">
+        <div class="container">
+            <div class="section-header">
+                <h2>Featured Collection</h2>
+                <p>Browse our curated categories of premium imported items</p>
+            </div>
+
+            <!-- Category Filter Buttons -->
+            <div class="category-filters" id="categoryFilters">
+                <button class="filter-btn active" data-filter="all">All Products</button>
+                <button class="filter-btn" data-filter="T-Shirts">T-Shirts</button>
+                <button class="filter-btn" data-filter="Trousers">Trousers</button>
+                <button class="filter-btn" data-filter="Jackets">Jackets</button>
+                <button class="filter-btn" data-filter="Blankets">Blankets</button>
+                <button class="filter-btn" data-filter="Branded Items">Branded Items</button>
+            </div>
+
+            <!-- Product Grid -->
+            <div class="product-grid" id="productGrid">
+                <!-- Products rendered dynamically via script.js -->
+            </div>
+        </div>
+    </section>
+
+    <!-- COD Banner Section -->
+    <section class="cod-banner">
+        <div class="container cod-content">
+            <div class="cod-text">
+                <span class="badge-sub">100% HASSLE-FREE SHOPPING</span>
+                <h2>Cash on Delivery Available Across Pakistan</h2>
+                <p>Order with confidence from Karachi, Lahore, Islamabad, Faisalabad, or any city nationwide. Pay only when you receive your package at your doorstep.</p>
+                <a href="#shop" class="btn btn-white">Explore Catalog</a>
+            </div>
+            <div class="cod-icon">
+                <i class="fa-solid fa-box-open"></i>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Us Section -->
+    <section class="about-section" id="about">
+        <div class="container about-grid">
+            <div class="about-image">
+                <img src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=800&q=80" alt="Vogue Exotic Showroom">
+            </div>
+            <div class="about-text">
+                <span class="badge-sub">OUR STORY</span>
+                <h2>Redefining Thrift & Imported Fashion in Pakistan</h2>
+                <p>At Vogue Exotic, we bring world-class curated fashion, rare streetwear, vintage apparel, and luxury home textiles straight to Pakistan. Every piece in our inventory is hand-selected to ensure supreme quality, unique aesthetics, and unmatched value.</p>
+                <p>Whether you are looking for vintage band tees, cozy woven tapestry blankets, or branded outerwear, we make international fashion accessible with seamless Cash on Delivery service.</p>
+                <div class="about-features">
+                    <span><i class="fa-solid fa-check"></i> Premium Imported Quality</span>
+                    <span><i class="fa-solid fa-check"></i> Fast Nationwide Shipping</span>
+                    <span><i class="fa-solid fa-check"></i> Direct WhatsApp Assistance</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section class="contact-section" id="contact">
+        <div class="container">
+            <div class="section-header">
+                <h2>Get in Touch</h2>
+                <p>Have questions about sizing, products, or wholesale? Reach out to us anytime.</p>
+            </div>
+            <div class="contact-grid">
+                <div class="contact-card">
+                    <i class="fa-brands fa-whatsapp"></i>
+                    <h3>WhatsApp Order Line</h3>
+                    <p>Instant replies for orders & queries</p>
+                    <a href="https://wa.me/YOUR_WHATSAPP_NUMBER" target="_blank">+92 300 1234567</a>
+                </div>
+                <div class="contact-card">
+                    <i class="fa-solid fa-envelope"></i>
+                    <h3>Email Support</h3>
+                    <p>Send us your inquiries anytime</p>
+                    <a href="mailto:support@vogueexotic.pk">support@vogueexotic.pk</a>
+                </div>
+                <div class="contact-card">
+                    <i class="fa-solid fa-location-dot"></i>
+                    <h3>Location</h3>
+                    <p>Imported & Dispatched from</p>
+                    <span>Karachi, Pakistan</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Shopping Cart Slide-over Drawer -->
+    <div class="cart-overlay" id="cartOverlay"></div>
+    <div class="cart-drawer" id="cartDrawer">
+        <div class="cart-header">
+            <h3>Your Shopping Cart (<span id="cartCount">0</span>)</h3>
+            <button class="close-cart-btn" id="closeCartBtn"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        
+        <div class="cart-body" id="cartBody">
+            <!-- Cart items populated via JS -->
+            <div class="empty-cart" id="emptyCart">
+                <i class="fa-solid fa-bag-shopping"></i>
+                <p>Your cart is currently empty.</p>
+                <button class="btn btn-primary" id="startShoppingBtn">Start Shopping</button>
+            </div>
+        </div>
+
+        <div class="cart-footer" id="cartFooter" style="display: none;">
+            <div class="cart-total-row">
+                <span>Subtotal:</span>
+                <span id="cartSubtotal">Rs. 0</span>
+            </div>
+            <div class="cart-total-row">
+                <span>Shipping (COD):</span>
+                <span>Rs. 250</span>
+            </div>
+            <div class="cart-total-row grand-total">
+                <span>Total Amount:</span>
+                <span id="cartGrandTotal">Rs. 0</span>
+            </div>
+
+            <div class="checkout-form">
+                <h4>Delivery Details (Cash on Delivery)</h4>
+                <div class="form-group">
+                    <input type="text" id="custName" placeholder="Full Name *" required>
+                </div>
+                <div class="form-group">
+                    <input type="tel" id="custPhone" placeholder="Mobile Phone (e.g., 03001234567) *" required>
+                </div>
+                <div class="form-group">
+                    <input type="text" id="custCity" placeholder="City (e.g., Karachi, Lahore) *" required>
+                </div>
+                <div class="form-group">
+                    <textarea id="custAddress" placeholder="Complete Delivery Address (House/Street/Area) *" rows="2" required></textarea>
+                </div>
+            </div>
+
+            <div class="cart-action-buttons">
+                <button class="btn btn-whatsapp-order" id="whatsappCheckoutBtn">
+                    <i class="fa-brands fa-whatsapp"></i> Order on WhatsApp (COD)
+                </button>
+            </div>
         </div>
     </div>
 
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container footer-grid">
+            <div class="footer-col">
+                <a href="#" class="logo footer-logo">VOGUE<span>EXOTIC</span></a>
+                <p>Your ultimate destination in Pakistan for premium imported pre-owned streetwear, apparel, jackets, and woven tapestry blankets.</p>
+                <div class="social-icons">
+                    <a href="#" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+                    <a href="#" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+                    <a href="https://wa.me/YOUR_WHATSAPP_NUMBER" target="_blank" aria-label="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
+                </div>
+            </div>
+            <div class="footer-col">
+                <h3>Quick Links</h3>
+                <ul class="footer-links">
+                    <li><a href="#home">Home</a></li>
+                    <li><a href="#shop">Shop Catalog</a></li>
+                    <li><a href="#about">About Us</a></li>
+                    <li><a href="#contact">Contact Support</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h3>Customer Service</h3>
+                <ul class="footer-links">
+                    <li><a href="#">Cash on Delivery Info</a></li>
+                    <li><a href="#">Nationwide Shipping</a></li>
+                    <li><a href="#">Size Guide</a></li>
+                    <li><a href="#">Privacy Policy</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h3>Contact Info</h3>
+                <p><i class="fa-solid fa-phone"></i> +92 300 1234567</p>
+                <p><i class="fa-brands fa-whatsapp"></i> +92 300 1234567</p>
+                <p><i class="fa-solid fa-envelope"></i> support@vogueexotic.pk</p>
+                <p><i class="fa-solid fa-location-dot"></i> Karachi, Pakistan</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 VOGUE EXOTIC Pakistan. All Rights Reserved. Cash on Delivery Available.</p>
+        </div>
+    </footer>
+
+    <!-- JavaScript File Link -->
+    <script src="script.js"></script>
 </body>
 </html>
