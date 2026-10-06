@@ -1,93 +1,41 @@
 /* =========================================================
-   VOGUE EXOTIC - E-COMMERCE JAVASCRIPT & PRODUCT DATABASE
+   E-COMMERCE & ADMIN PANEL JAVASCRIPT
    ========================================================= */
 
-// --- CONFIGURABLE WHATSAPP NUMBER ---
-const WHATSAPP_NUMBER = "YOUR_WHATSAPP_NUMBER";
+// --- LOCALSTORAGE KEYS ---
+const STORAGE_KEY_PRODUCTS = "local_store_products_v1";
+const STORAGE_KEY_SETTINGS = "local_store_settings_v1";
 
-// --- PRODUCT DATABASE (Easily edit, add or remove items here) ---
-const products = [
-    {
-        id: 1,
-        name: "Vintage Oversized Band T-Shirt",
-        category: "T-Shirts",
-        price: 2499,
-        sizes: ["S", "M", "L", "XL"],
-        description: "Imported 100% heavy cotton vintage wash band tee with faded graphic print.",
-        image: "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=700&q=80",
-        badge: "Imported"
-    },
-    {
-        id: 2,
-        name: "Retro Cargo Streetwear Trousers",
-        category: "Trousers",
-        price: 4500,
-        sizes: ["30", "32", "34", "36"],
-        description: "Durable multi-pocket utility cargo trousers with relaxed urban fit.",
-        image: "https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?auto=format&fit=crop&w=700&q=80",
-        badge: "Best Seller"
-    },
-    {
-        id: 3,
-        name: "Classic Leather Biker Jacket",
-        category: "Jackets",
-        price: 9800,
-        sizes: ["M", "L", "XL"],
-        description: "Premium imported faux leather jacket with heavy-duty zips and quilted lining.",
-        image: "https://images.unsplash.com/photo-1551028719-00167b16eac5?auto=format&fit=crop&w=700&q=80",
-        badge: "Luxury"
-    },
-    {
-        id: 4,
-        name: "Heavy Woven Tapestry Blanket",
-        category: "Blankets",
-        price: 6500,
-        sizes: ["Standard (60x80\")"],
-        description: "Luxurious vintage art woven throw blanket, ideal for home decor or cozy lounging.",
-        image: "https://images.unsplash.com/photo-1584100936595-c0654b55a2e2?auto=format&fit=crop&w=700&q=80",
-        badge: "Imported"
-    },
-    {
-        id: 5,
-        name: "Branded Vintage Sports Windbreaker",
-        category: "Branded Items",
-        price: 5900,
-        sizes: ["M", "L", "XL"],
-        description: "Authentic imported retro sportswear windbreaker with embroidered chest logo.",
-        image: "https://images.unsplash.com/photo-1544441893-675973e31985?auto=format&fit=crop&w=700&q=80",
-        badge: "Rare Find"
-    },
-    {
-        id: 6,
-        name: "Heavyweight Acid Wash Tee",
-        category: "T-Shirts",
-        price: 2299,
-        sizes: ["S", "M", "L"],
-        description: "Prefaded acid wash streetwear tee crafted with ultra-soft breathable cotton.",
-        image: "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?auto=format&fit=crop&w=700&q=80",
-        badge: "New"
-    },
-    {
-        id: 7,
-        name: "Wide-Leg Aesthetic Trousers",
-        category: "Trousers",
-        price: 4100,
-        sizes: ["30", "32", "34"],
-        description: "Contemporary wide-leg tailored trousers designed for effortless streetwear styling.",
-        image: "https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?auto=format&fit=crop&w=700&q=80",
-        badge: "Trending"
-    },
-    {
-        id: 8,
-        name: "Vintage Aesthetic Tapestry Throw",
-        category: "Blankets",
-        price: 6200,
-        sizes: ["Standard (60x80\")"],
-        description: "Intricately woven vintage tapestry blanket featuring timeless artistic patterns.",
-        image: "https://images.unsplash.com/photo-1616046229478-9901c5536a45?auto=format&fit=crop&w=700&q=80",
-        badge: "Imported"
-    }
-];
+// --- DEFAULT STORE SETTINGS (Clean generic defaults, no fake numbers) ---
+const defaultSettings = {
+    storeName: "MY STORE",
+    whatsappNumber: "923001234567",
+    phone: "+92 300 1234567",
+    email: "info@yourstore.pk",
+    address: "Karachi, Pakistan",
+    instagram: "https://instagram.com",
+    facebook: "https://facebook.com"
+};
+
+// --- INITIALIZE STORE SETTINGS ---
+function getStoreSettings() {
+    const saved = localStorage.getItem(STORAGE_KEY_SETTINGS);
+    return saved ? JSON.parse(saved) : defaultSettings;
+}
+
+function saveStoreSettings(settings) {
+    localStorage.setItem(STORAGE_KEY_SETTINGS, JSON.stringify(settings));
+}
+
+// --- INITIALIZE PRODUCTS (Starts completely empty) ---
+function getProducts() {
+    const saved = localStorage.getItem(STORAGE_KEY_PRODUCTS);
+    return saved ? JSON.parse(saved) : [];
+}
+
+function saveProducts(products) {
+    localStorage.setItem(STORAGE_KEY_PRODUCTS, JSON.stringify(products));
+}
 
 // --- SHOPPING CART STATE ---
 let cart = [];
@@ -113,24 +61,90 @@ const closeMenuBtn = document.getElementById('closeMenuBtn');
 const navMenu = document.getElementById('navMenu');
 const startShoppingBtn = document.getElementById('startShoppingBtn');
 
-// --- INITIALIZE WEBSITE ---
+// Admin Elements
+const productForm = document.getElementById('productForm');
+const settingsForm = document.getElementById('settingsForm');
+const adminTableBody = document.getElementById('adminTableBody');
+const adminProductCount = document.getElementById('adminProductCount');
+const prodImageFile = document.getElementById('prodImageFile');
+const prodImageBase64 = document.getElementById('prodImageBase64');
+const editProductId = document.getElementById('editProductId');
+const formTitle = document.getElementById('formTitle');
+const saveProductBtn = document.getElementById('saveProductBtn');
+const cancelEditBtn = document.getElementById('cancelEditBtn');
+const adminTabBtns = document.querySelectorAll('.admin-tab-btn');
+const adminTabContents = document.querySelectorAll('.admin-tab-content');
+
+// --- INITIALIZE ON PAGE LOAD ---
 document.addEventListener('DOMContentLoaded', () => {
-    renderProducts(products);
+    applyStoreSettings();
+    renderProducts(getProducts());
+    renderAdminTable();
     setupEventListeners();
     updateCartUI();
 });
 
-// --- RENDER PRODUCTS ---
+// --- APPLY STORE SETTINGS TO UI ---
+function applyStoreSettings() {
+    const settings = getStoreSettings();
+    
+    // Header & Logo
+    document.getElementById('pageTitle').textContent = `${settings.storeName} | Premium Collection`;
+    const firstWord = settings.storeName.split(' ')[0] || 'MY';
+    const restWords = settings.storeName.split(' ').slice(1).join(' ') || 'STORE';
+    const logoHtml = `${firstWord}<span>${restWords}</span>`;
+    document.getElementById('headerLogo').innerHTML = logoHtml;
+    document.getElementById('footerLogo').innerHTML = logoHtml;
+
+    // Hero Section
+    document.getElementById('heroWhatsAppBtn').href = `https://wa.me/${settings.whatsappNumber}?text=Hi,%20I%20want%20to%20inquire%20about%20your%20products.`;
+
+    // Contact Section
+    document.getElementById('contactWhatsAppLink').textContent = settings.phone;
+    document.getElementById('contactWhatsAppLink').href = `https://wa.me/${settings.whatsappNumber}`;
+    document.getElementById('contactEmailLink').textContent = settings.email;
+    document.getElementById('contactEmailLink').href = `mailto:${settings.email}`;
+    document.getElementById('contactAddressSpan').textContent = settings.address;
+
+    // Footer
+    document.getElementById('footerFacebook').href = settings.facebook;
+    document.getElementById('footerInstagram').href = settings.instagram;
+    document.getElementById('footerWhatsApp').href = `https://wa.me/${settings.whatsappNumber}`;
+    document.getElementById('footerPhoneText').textContent = settings.phone;
+    document.getElementById('footerWaText').textContent = settings.phone;
+    document.getElementById('footerEmailText').textContent = settings.email;
+    document.getElementById('footerLocationText').textContent = settings.address;
+    document.getElementById('footerCopyStore').textContent = settings.storeName;
+
+    // Populate Settings Form Inputs
+    document.getElementById('settingStoreName').value = settings.storeName;
+    document.getElementById('settingWhatsApp').value = settings.whatsappNumber;
+    document.getElementById('settingPhone').value = settings.phone;
+    document.getElementById('settingEmail').value = settings.email;
+    document.getElementById('settingAddress').value = settings.address;
+    document.getElementById('settingInstagram').value = settings.instagram;
+    document.getElementById('settingFacebook').value = settings.facebook;
+}
+
+// --- RENDER PRODUCTS IN SHOP SECTION ---
 function renderProducts(itemsToRender) {
     productGrid.innerHTML = '';
 
     if (itemsToRender.length === 0) {
-        productGrid.innerHTML = `<p style="grid-column: 1/-1; text-align:center; padding: 40px; color: var(--text-secondary);">No products found in this category.</p>`;
+        productGrid.innerHTML = `
+            <div style="grid-column: 1/-1; text-align:center; padding: 60px 20px;">
+                <i class="fa-solid fa-box-open" style="font-size: 48px; color: var(--text-light); margin-bottom: 16px;"></i>
+                <h3 style="font-size: 18px; margin-bottom: 8px;">No Products Found</h3>
+                <p style="color: var(--text-secondary); margin-bottom: 20px;">Your shop is currently empty. Use the Admin Panel below to add your products.</p>
+                <a href="#adminSection" class="btn btn-primary"><i class="fa-solid fa-plus"></i> Go to Admin Panel</a>
+            </div>
+        `;
         return;
     }
 
     itemsToRender.forEach(product => {
-        const sizesHtml = product.sizes.map(size => `<span class="size-tag">${size}</span>`).join('');
+        const sizesArray = product.sizes.split(',').map(s => s.trim()).filter(s => s);
+        const sizesHtml = sizesArray.map(size => `<span class="size-tag">${size}</span>`).join('');
         
         const card = document.createElement('div');
         card.className = 'product-card';
@@ -144,7 +158,7 @@ function renderProducts(itemsToRender) {
                 <h3 class="product-title">${product.name}</h3>
                 <p class="product-description">${product.description}</p>
                 <div class="product-meta-row">
-                    <span class="product-price">Rs. ${product.price.toLocaleString()}</span>
+                    <span class="product-price">Rs. ${Number(product.price).toLocaleString()}</span>
                     <div class="product-sizes">${sizesHtml}</div>
                 </div>
                 <div class="product-buttons">
@@ -161,6 +175,36 @@ function renderProducts(itemsToRender) {
     });
 }
 
+// --- RENDER ADMIN TABLE ---
+function renderAdminTable() {
+    const products = getProducts();
+    adminProductCount.textContent = products.length;
+    adminTableBody.innerHTML = '';
+
+    if (products.length === 0) {
+        adminTableBody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--text-secondary); padding: 30px;">No products added yet. Use the form above to add your first product.</td></tr>`;
+        return;
+    }
+
+    products.forEach(product => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td><img src="${product.image}" alt="${product.name}"></td>
+            <td><strong>${product.name}</strong></td>
+            <td>${product.category}</td>
+            <td>Rs. ${Number(product.price).toLocaleString()}</td>
+            <td>${product.sizes}</td>
+            <td>
+                <div class="table-actions">
+                    <button class="btn-table-action btn-edit" onclick="editProduct(${product.id})"><i class="fa-solid fa-pen"></i> Edit</button>
+                    <button class="btn-table-action btn-delete" onclick="deleteProduct(${product.id})"><i class="fa-solid fa-trash"></i> Delete</button>
+                </div>
+            </td>
+        `;
+        adminTableBody.appendChild(row);
+    });
+}
+
 // --- SETUP EVENT LISTENERS ---
 function setupEventListeners() {
     // Category Filtering
@@ -170,6 +214,7 @@ function setupEventListeners() {
             e.target.classList.add('active');
 
             const filter = e.target.getAttribute('data-filter');
+            const products = getProducts();
             if (filter === 'all') {
                 renderProducts(products);
             } else {
@@ -179,9 +224,9 @@ function setupEventListeners() {
         }
     });
 
-    // Nav Links category filtering support
+    // Nav Links filtering
     document.querySelectorAll('.nav-link[data-filter]').forEach(link => {
-        link.addEventListener('click', (e) => {
+        link.addEventListener('click', () => {
             const filter = link.getAttribute('data-filter');
             document.querySelectorAll('.filter-btn').forEach(btn => {
                 if (btn.getAttribute('data-filter') === filter) {
@@ -190,6 +235,126 @@ function setupEventListeners() {
             });
             navMenu.classList.remove('active');
         });
+    });
+
+    // Admin Tabs
+    adminTabBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            adminTabBtns.forEach(b => b.classList.remove('active'));
+            adminTabContents.forEach(c => c.classList.remove('active'));
+            btn.classList.add('active');
+            document.getElementById(btn.getAttribute('data-tab')).classList.add('active');
+        });
+    });
+
+    // Image Compression & Upload Handler
+    prodImageFile.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function(event) {
+            const img = new Image();
+            img.onload = function() {
+                const canvas = document.createElement('canvas');
+                let width = img.width;
+                let height = img.height;
+                const MAX_WIDTH = 800;
+                const MAX_HEIGHT = 800;
+
+                if (width > height) {
+                    if (width > MAX_WIDTH) {
+                        height *= MAX_WIDTH / width;
+                        width = MAX_WIDTH;
+                    }
+                } else {
+                    if (height > MAX_HEIGHT) {
+                        width *= MAX_HEIGHT / height;
+                        height = MAX_HEIGHT;
+                    }
+                }
+
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, width, height);
+                
+                // Compress image to JPEG quality 0.8
+                const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
+                prodImageBase64.value = dataUrl;
+            };
+            img.src = event.target.result;
+        };
+        reader.readAsDataURL(file);
+    });
+
+    // Save Product Form Submission (Add / Edit)
+    productForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const idVal = editProductId.value;
+        const name = document.getElementById('prodName').value.trim();
+        const price = Number(document.getElementById('prodPrice').value);
+        const category = document.getElementById('prodCategory').value;
+        const badge = document.getElementById('prodBadge').value.trim();
+        const sizes = document.getElementById('prodSizes').value.trim();
+        const description = document.getElementById('prodDesc').value.trim();
+        let image = prodImageBase64.value;
+
+        let products = getProducts();
+
+        if (idVal) {
+            // Editing existing product
+            const index = products.findIndex(p => p.id == idVal);
+            if (index !== -1) {
+                if (!image) {
+                    image = products[index].image; // keep existing image if no new file uploaded
+                }
+                products[index] = { id: Number(idVal), name, price, category, badge, sizes, description, image };
+            }
+        } else {
+            // Adding new product
+            if (!image) {
+                alert('Please select a product image from your phone/PC.');
+                return;
+            }
+            const newProduct = {
+                id: Date.now(),
+                name,
+                price,
+                category,
+                badge,
+                sizes,
+                description,
+                image
+            };
+            products.unshift(newProduct);
+        }
+
+        saveProducts(products);
+        renderProducts(products);
+        renderAdminTable();
+        resetProductForm();
+        alert('Product successfully saved!');
+    });
+
+    cancelEditBtn.addEventListener('click', resetProductForm);
+
+    // Save Settings Form Submission
+    settingsForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const newSettings = {
+            storeName: document.getElementById('settingStoreName').value.trim(),
+            whatsappNumber: document.getElementById('settingWhatsApp').value.trim(),
+            phone: document.getElementById('settingPhone').value.trim(),
+            email: document.getElementById('settingEmail').value.trim(),
+            address: document.getElementById('settingAddress').value.trim(),
+            instagram: document.getElementById('settingInstagram').value.trim(),
+            facebook: document.getElementById('settingFacebook').value.trim()
+        };
+
+        saveStoreSettings(newSettings);
+        applyStoreSettings();
+        alert('Store settings successfully updated!');
     });
 
     // Cart Drawer Open/Close
@@ -219,9 +384,54 @@ function toggleCart() {
     cartOverlay.classList.toggle('active');
 }
 
+// --- ADMIN CRUD FUNCTIONS ---
+function editProduct(id) {
+    const products = getProducts();
+    const product = products.find(p => p.id === id);
+    if (!product) return;
+
+    editProductId.value = product.id;
+    document.getElementById('prodName').value = product.name;
+    document.getElementById('prodPrice').value = product.price;
+    document.getElementById('prodCategory').value = product.category;
+    document.getElementById('prodBadge').value = product.badge;
+    document.getElementById('prodSizes').value = product.sizes;
+    document.getElementById('prodDesc').value = product.description;
+    prodImageBase64.value = product.image;
+
+    formTitle.innerHTML = `<i class="fa-solid fa-pen-to-square"></i> Edit Product (#${product.id})`;
+    saveProductBtn.textContent = "Update Product";
+    cancelEditBtn.style.display = "inline-block";
+
+    // Scroll to form
+    location.href = "#adminSection";
+}
+
+function deleteProduct(id) {
+    if (confirm('Are you sure you want to delete this product?')) {
+        let products = getProducts();
+        products = products.filter(p => p.id !== id);
+        saveProducts(products);
+        renderProducts(products);
+        renderAdminTable();
+    }
+}
+
+function resetProductForm() {
+    productForm.reset();
+    editProductId.value = '';
+    prodImageBase64.value = '';
+    formTitle.innerHTML = `<i class="fa-solid fa-plus-circle"></i> Add New Product`;
+    saveProductBtn.textContent = "Save Product";
+    cancelEditBtn.style.display = "none";
+}
+
 // --- CART LOGIC ---
 function addToCart(productId) {
+    const products = getProducts();
     const product = products.find(p => p.id === productId);
+    if (!product) return;
+
     const existingItem = cart.find(item => item.id === productId);
 
     if (existingItem) {
@@ -231,7 +441,6 @@ function addToCart(productId) {
     }
 
     updateCartUI();
-    // Automatically open cart drawer to confirm addition
     if (!cartDrawer.classList.contains('active')) {
         toggleCart();
     }
@@ -261,14 +470,12 @@ function updateCartUI() {
     if (cart.length === 0) {
         emptyCart.style.display = 'block';
         cartFooter.style.display = 'none';
-        // Remove existing items from body except emptyCart
         const items = cartBody.querySelectorAll('.cart-item');
         items.forEach(i => i.remove());
     } else {
         emptyCart.style.display = 'none';
         cartFooter.style.display = 'block';
 
-        // Render cart items
         let cartItemsHtml = '';
         let subtotal = 0;
 
@@ -279,7 +486,7 @@ function updateCartUI() {
                     <img src="${item.image}" alt="${item.name}" class="cart-item-img">
                     <div class="cart-item-details">
                         <h4 class="cart-item-title">${item.name}</h4>
-                        <div class="cart-item-price">Rs. ${item.price.toLocaleString()}</div>
+                        <div class="cart-item-price">Rs. ${Number(item.price).toLocaleString()}</div>
                         <div class="cart-item-controls">
                             <button class="quantity-btn" onclick="updateQuantity(${item.id}, -1)">-</button>
                             <span class="cart-item-qty">${item.quantity}</span>
@@ -291,7 +498,6 @@ function updateCartUI() {
             `;
         });
 
-        // Keep empty cart hidden and update items
         const existingItems = cartBody.querySelectorAll('.cart-item');
         existingItems.forEach(i => i.remove());
         cartBody.insertAdjacentHTML('afterbegin', cartItemsHtml);
@@ -314,12 +520,13 @@ function processWhatsAppCheckout() {
         return;
     }
 
+    const settings = getStoreSettings();
     let subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
     let grandTotal = subtotal + SHIPPING_FEE;
 
     let itemsListText = cart.map(item => `• ${item.name} (Qty: ${item.quantity}) - Rs. ${(item.price * item.quantity).toLocaleString()}`).join('\n');
 
-    let message = `*New Order - Vogue Exotic (Cash on Delivery)*\n\n` +
+    let message = `*New Order - ${settings.storeName} (Cash on Delivery)*\n\n` +
                   `*Customer Details:*\n` +
                   `Name: ${name}\n` +
                   `Phone: ${phone}\n` +
@@ -332,20 +539,24 @@ function processWhatsAppCheckout() {
                   `Payment Method: Cash on Delivery (COD)`;
 
     let encodedMessage = encodeURIComponent(message);
-    let whatsappURL = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodedMessage}`;
+    let whatsappURL = `https://wa.me/${settings.whatsappNumber}?text=${encodedMessage}`;
 
     window.open(whatsappURL, '_blank');
 }
 
 // --- QUICK WHATSAPP ORDER FOR SINGLE PRODUCTS ---
 function quickWhatsAppOrder(productId) {
+    const products = getProducts();
     const product = products.find(p => p.id === productId);
-    let message = `*Quick Order - Vogue Exotic*\n\n` +
+    if (!product) return;
+
+    const settings = getStoreSettings();
+    let message = `*Quick Order - ${settings.storeName}*\n\n` +
                   `Product: ${product.name}\n` +
                   `Category: ${product.category}\n` +
-                  `Price: Rs. ${product.price.toLocaleString()}\n\n` +
+                  `Price: Rs. ${Number(product.price).toLocaleString()}\n\n` +
                   `I would like to order this item. Please share further details.`;
 
     let encodedMessage = encodeURIComponent(message);
-    window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodedMessage}`, '_blank');
+    window.open(`https://wa.me/${settings.whatsappNumber}?text=${encodedMessage}`, '_blank');
 }
