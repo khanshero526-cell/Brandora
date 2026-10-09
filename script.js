@@ -1,41 +1,36 @@
 /* =========================================================
-   BRANDORA E-COMMERCE WEBSITE
-   FIREBASE REALTIME DATABASE
-   CLOUDINARY IMAGE UPLOAD
-   PRODUCT STOCK, CART AND WHATSAPP ORDERS
-   MAXIMUM 4 IMAGES PER PRODUCT
+BRANDORA E-COMMERCE WEBSITE
+FIREBASE + CLOUDINARY + STOCK + CART + WHATSAPP ORDERS
+MAXIMUM 4 IMAGES PER PRODUCT
 ========================================================= */
 
-
 /* =========================================================
-   FIREBASE CONFIGURATION
+FIREBASE CONFIGURATION
 ========================================================= */
 
 const FIREBASE_DATABASE_URL =
-    "https://brandora-82748-default-rtdb.firebaseio.com";
+"https://brandora-82748-default-rtdb.firebaseio.com";
 
 const FIREBASE_PRODUCTS_PATH = "/products.json";
 const FIREBASE_SETTINGS_PATH = "/settings.json";
-
+const FIREBASE_ORDERS_PATH = "/orders.json";
 
 /* =========================================================
-   CLOUDINARY CONFIGURATION
+CLOUDINARY CONFIGURATION
 ========================================================= */
 
 const CLOUDINARY_CLOUD_NAME = "spbb53tj";
 const CLOUDINARY_UPLOAD_PRESET = "brandora_products";
 
-
 /* =========================================================
-   LOCAL STORAGE
+LOCAL STORAGE
 ========================================================= */
 
 const STORAGE_KEY_PRODUCTS = "local_store_products_v1";
 const STORAGE_KEY_SETTINGS = "local_store_settings_v1";
 
-
 /* =========================================================
-   DEFAULT SETTINGS
+DEFAULT SETTINGS
 ========================================================= */
 
 const defaultSettings = {
@@ -48,9 +43,8 @@ const defaultSettings = {
     facebook: "https://facebook.com"
 };
 
-
 /* =========================================================
-   FIREBASE FUNCTIONS
+FIREBASE FUNCTIONS
 ========================================================= */
 
 async function firebaseSet(path, data) {
@@ -74,7 +68,6 @@ async function firebaseSet(path, data) {
     return await response.json();
 }
 
-
 async function firebaseGet(path) {
     const response = await fetch(
         FIREBASE_DATABASE_URL + path
@@ -89,9 +82,31 @@ async function firebaseGet(path) {
     return await response.json();
 }
 
+/* SAVE A NEW ORDER WITHOUT REPLACING EXISTING ORDERS */
+
+async function firebasePost(path, data) {
+    const response = await fetch(
+        FIREBASE_DATABASE_URL + path,
+        {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(data)
+        }
+    );
+
+    if (!response.ok) {
+        throw new Error(
+            "Firebase order save failed: " + response.status
+        );
+    }
+
+    return await response.json();
+}
 
 /* =========================================================
-   SETTINGS FUNCTIONS
+SETTINGS FUNCTIONS
 ========================================================= */
 
 function getStoreSettings() {
@@ -112,7 +127,6 @@ function getStoreSettings() {
         return { ...defaultSettings };
     }
 }
-
 
 async function loadStoreSettingsFromFirebase() {
     try {
@@ -143,7 +157,6 @@ async function loadStoreSettingsFromFirebase() {
     return getStoreSettings();
 }
 
-
 function saveStoreSettings(settings) {
     localStorage.setItem(
         STORAGE_KEY_SETTINGS,
@@ -165,9 +178,8 @@ function saveStoreSettings(settings) {
     });
 }
 
-
 /* =========================================================
-   PRODUCT FUNCTIONS
+PRODUCT FUNCTIONS
 ========================================================= */
 
 function getProductStock(product) {
@@ -183,14 +195,12 @@ function getProductStock(product) {
     return 1;
 }
 
-
 function normalizeProduct(product) {
     return {
         ...product,
         stock: getProductStock(product)
     };
 }
-
 
 function getProducts() {
     const saved = localStorage.getItem(
@@ -209,7 +219,6 @@ function getProducts() {
         return [];
     }
 }
-
 
 async function loadProductsFromFirebase() {
     try {
@@ -245,20 +254,17 @@ async function loadProductsFromFirebase() {
     }
 }
 
-
 function saveProducts(products) {
     try {
         const normalized = products.map(
             normalizeProduct
         );
 
-        // Save local backup.
         localStorage.setItem(
             STORAGE_KEY_PRODUCTS,
             JSON.stringify(normalized)
         );
 
-        // Save products online.
         firebaseSet(
             FIREBASE_PRODUCTS_PATH,
             normalized
@@ -274,6 +280,7 @@ function saveProducts(products) {
         });
 
         return true;
+
     } catch (error) {
         if (
             error.name === "QuotaExceededError"
@@ -289,9 +296,8 @@ function saveProducts(products) {
     }
 }
 
-
 /* =========================================================
-   PRODUCT IMAGES
+PRODUCT IMAGES
 ========================================================= */
 
 function getProductImages(product) {
@@ -309,9 +315,8 @@ function getProductImages(product) {
     return [];
 }
 
-
 /* =========================================================
-   IMAGE COMPRESSION
+IMAGE COMPRESSION
 ========================================================= */
 
 function compressImage(file) {
@@ -333,6 +338,7 @@ function compressImage(file) {
                     );
 
                     width = max;
+
                 } else if (
                     height >= width &&
                     height > max
@@ -344,9 +350,8 @@ function compressImage(file) {
                     height = max;
                 }
 
-                const canvas = document.createElement(
-                    "canvas"
-                );
+                const canvas =
+                    document.createElement("canvas");
 
                 canvas.width = width;
                 canvas.height = height;
@@ -378,9 +383,8 @@ function compressImage(file) {
     });
 }
 
-
 /* =========================================================
-   UPLOAD IMAGE TO CLOUDINARY
+UPLOAD IMAGE TO CLOUDINARY
 ========================================================= */
 
 async function uploadImageToCloudinary(dataUrl) {
@@ -421,18 +425,16 @@ async function uploadImageToCloudinary(dataUrl) {
     return result.secure_url;
 }
 
-
 /* =========================================================
-   CART SETTINGS
+CART SETTINGS
 ========================================================= */
 
 let cart = [];
 
 const SHIPPING_FEE = 250;
 
-
 /* =========================================================
-   DOM ELEMENTS
+DOM ELEMENTS
 ========================================================= */
 
 const productGrid =
@@ -489,9 +491,8 @@ const navMenu =
 const startShoppingBtn =
     document.getElementById("startShoppingBtn");
 
-
 /* =========================================================
-   ADMIN ELEMENTS
+ADMIN ELEMENTS
 ========================================================= */
 
 const productForm =
@@ -530,9 +531,8 @@ const adminTabBtns =
 const adminTabContents =
     document.querySelectorAll(".admin-tab-content");
 
-
 /* =========================================================
-   CREATE STOCK FIELD
+CREATE STOCK FIELD
 ========================================================= */
 
 function createStockFieldIfMissing() {
@@ -582,6 +582,7 @@ function createStockFieldIfMissing() {
             stockGroup,
             imageGroup
         );
+
     } else if (productForm) {
         productForm.prepend(stockGroup);
     }
@@ -589,9 +590,8 @@ function createStockFieldIfMissing() {
     return document.getElementById("prodStock");
 }
 
-
 /* =========================================================
-   APPLY STORE SETTINGS
+APPLY STORE SETTINGS
 ========================================================= */
 
 function applyStoreSettings(customSettings = null) {
@@ -610,7 +610,9 @@ function applyStoreSettings(customSettings = null) {
         document.getElementById("footerLogo");
 
     const nameParts =
-        settings.storeName.trim().split(/\s+/);
+        String(settings.storeName || "BRANDORA")
+            .trim()
+            .split(/\s+/);
 
     const firstWord = nameParts[0] || "BRANDORA";
 
@@ -750,7 +752,8 @@ function applyStoreSettings(customSettings = null) {
 
     Object.entries(settingFields).forEach(
         ([id, value]) => {
-            const element = document.getElementById(id);
+            const element =
+                document.getElementById(id);
 
             if (element) {
                 element.value = value;
@@ -759,9 +762,8 @@ function applyStoreSettings(customSettings = null) {
     );
 }
 
-
 /* =========================================================
-   RENDER PRODUCTS
+RENDER PRODUCTS
 ========================================================= */
 
 function renderProducts(itemsToRender) {
@@ -805,7 +807,9 @@ function renderProducts(itemsToRender) {
                 .filter(Boolean);
 
         const sizesHtml = sizesArray
-            .map(size => `<span class="size-tag">${size}</span>`)
+            .map(size =>
+                `<span class="size-tag">${size}</span>`
+            )
             .join("");
 
         const images = getProductImages(product);
@@ -929,9 +933,8 @@ function renderProducts(itemsToRender) {
     });
 }
 
-
 /* =========================================================
-   CHANGE PRODUCT IMAGE
+CHANGE PRODUCT IMAGE
 ========================================================= */
 
 function changeProductImage(productId, index) {
@@ -966,9 +969,8 @@ function changeProductImage(productId, index) {
     }
 }
 
-
 /* =========================================================
-   ADMIN TABLE
+ADMIN TABLE
 ========================================================= */
 
 function renderAdminTable() {
@@ -1047,9 +1049,8 @@ function renderAdminTable() {
     });
 }
 
-
 /* =========================================================
-   RESET PRODUCT FORM
+RESET PRODUCT FORM
 ========================================================= */
 
 function resetProductForm() {
@@ -1078,9 +1079,8 @@ function resetProductForm() {
     saveProductBtn.disabled = false;
 }
 
-
 /* =========================================================
-   EDIT PRODUCT
+EDIT PRODUCT
 ========================================================= */
 
 function editProduct(id) {
@@ -1134,9 +1134,8 @@ function editProduct(id) {
     location.href = "#adminSection";
 }
 
-
 /* =========================================================
-   DELETE PRODUCT
+DELETE PRODUCT
 ========================================================= */
 
 function deleteProduct(id) {
@@ -1154,9 +1153,8 @@ function deleteProduct(id) {
     renderAdminTable();
 }
 
-
 /* =========================================================
-   CART
+CART
 ========================================================= */
 
 function toggleCart() {
@@ -1167,7 +1165,6 @@ function toggleCart() {
     cartDrawer.classList.toggle("active");
     cartOverlay.classList.toggle("active");
 }
-
 
 function addToCart(productId) {
     const products = getProducts();
@@ -1198,6 +1195,7 @@ function addToCart(productId) {
         }
 
         existingItem.quantity += 1;
+
     } else {
         cart.push({
             ...product,
@@ -1215,7 +1213,6 @@ function addToCart(productId) {
         toggleCart();
     }
 }
-
 
 function updateQuantity(productId, change) {
     const item = cart.find(
@@ -1253,7 +1250,6 @@ function updateQuantity(productId, change) {
     updateCartUI();
 }
 
-
 function removeFromCart(productId) {
     cart = cart.filter(
         p => p.id !== productId
@@ -1261,7 +1257,6 @@ function removeFromCart(productId) {
 
     updateCartUI();
 }
-
 
 function updateCartUI() {
     if (!cartBody) {
@@ -1390,16 +1385,22 @@ function updateCartUI() {
     }
 }
 
-
 /* =========================================================
-   WHATSAPP CHECKOUT
+WHATSAPP CHECKOUT + FIREBASE ORDER SAVE
 ========================================================= */
 
-function processWhatsAppCheckout() {
-    const name = document.getElementById("custName").value.trim();
-    const phone = document.getElementById("custPhone").value.trim();
-    const city = document.getElementById("custCity").value.trim();
-    const address = document.getElementById("custAddress").value.trim();
+async function processWhatsAppCheckout() {
+    const name =
+        document.getElementById("custName").value.trim();
+
+    const phone =
+        document.getElementById("custPhone").value.trim();
+
+    const city =
+        document.getElementById("custCity").value.trim();
+
+    const address =
+        document.getElementById("custAddress").value.trim();
 
     if (!name || !phone || !city || !address) {
         alert("Please fill in all delivery details.");
@@ -1442,7 +1443,9 @@ function processWhatsAppCheckout() {
             .replace(/\D/g, "");
 
     if (!whatsappNumber) {
-        alert("Please set your WhatsApp number in Admin Settings.");
+        alert(
+            "Please set your WhatsApp number in Admin Settings."
+        );
         return;
     }
 
@@ -1454,10 +1457,84 @@ function processWhatsAppCheckout() {
 
     const grandTotal = subtotal + SHIPPING_FEE;
 
-    const itemsListText = cart.map(
-        item =>
-            `• ${item.name} (Qty: ${item.quantity}) - Rs. ${(Number(item.price) * item.quantity).toLocaleString()}`
-    ).join("\n");
+    /*
+    SAVE A SNAPSHOT OF EACH PRODUCT.
+    Image URLs help identify the exact product.
+    */
+
+    const orderItems = cart.map(item => {
+        const images = getProductImages(item);
+
+        return {
+            productId: item.id,
+            name: item.name,
+            category: item.category || "",
+            price: Number(item.price),
+            quantity: item.quantity,
+            itemTotal: Number(item.price) * item.quantity,
+            image: images[0] || "",
+            images: images
+        };
+    });
+
+    /*
+    THIS DATA WILL BE SAVED UNDER FIREBASE "orders".
+    */
+
+    const orderData = {
+        orderDate: new Date().toISOString(),
+
+        customer: {
+            name: name,
+            phone: phone,
+            city: city,
+            address: address
+        },
+
+        items: orderItems,
+
+        subtotal: subtotal,
+        shipping: SHIPPING_FEE,
+        total: grandTotal,
+
+        paymentMethod: "Cash on Delivery",
+        status: "Pending"
+    };
+
+    /*
+    PRE-OPEN A TAB TO REDUCE POP-UP BLOCKING.
+    */
+
+    let whatsappWindow = null;
+
+    try {
+        whatsappWindow = window.open(
+            "about:blank",
+            "_blank"
+        );
+    } catch (error) {
+        console.warn("WhatsApp window could not be opened:", error);
+    }
+
+    /*
+    BUILD WHATSAPP MESSAGE WITH CLICKABLE IMAGE LINKS.
+    WHATSAPP PREFILLED TEXT CANNOT AUTOMATICALLY ATTACH PHOTOS.
+    */
+
+    const itemsListText = orderItems.map(item => {
+        const imageText = item.image
+            ? `Product image: ${item.image}`
+            : "Product image: Not available";
+
+        return (
+            `Product: ${item.name}\n` +
+            `Category: ${item.category}\n` +
+            `Price: Rs. ${item.price.toLocaleString()}\n` +
+            `Quantity: ${item.quantity}\n` +
+            `Item total: Rs. ${item.itemTotal.toLocaleString()}\n` +
+            `${imageText}`
+        );
+    }).join("\n\n");
 
     const message =
         `*New Order - ${settings.storeName} (Cash on Delivery)*\n\n` +
@@ -1468,23 +1545,89 @@ function processWhatsAppCheckout() {
         `Address: ${address}\n\n` +
         `*Order Items:*\n${itemsListText}\n\n` +
         `Subtotal: Rs. ${subtotal.toLocaleString()}\n` +
-        `Shipping (COD): Rs. ${SHIPPING_FEE}\n` +
+        `Shipping: Rs. ${SHIPPING_FEE.toLocaleString()}\n` +
         `*Total Amount: Rs. ${grandTotal.toLocaleString()}*\n\n` +
         `Payment Method: Cash on Delivery (COD)`;
 
     const whatsappURL =
         `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
 
-    window.open(
-        whatsappURL,
-        "_blank",
-        "noopener"
-    );
+    /*
+    SAVE THE ORDER TO FIREBASE FIRST.
+    IF ONLINE SAVE FAILS, ASK BEFORE CONTINUING TO WHATSAPP.
+    */
+
+    if (whatsappCheckoutBtn) {
+        whatsappCheckoutBtn.disabled = true;
+        whatsappCheckoutBtn.textContent = "Saving Order...";
+    }
+
+    try {
+        const result = await firebasePost(
+            FIREBASE_ORDERS_PATH,
+            orderData
+        );
+
+        console.log(
+            "Order saved to Firebase:",
+            result
+        );
+
+        /*
+        Firebase returns a generated order key.
+        Add it to the WhatsApp message so orders are easier to match.
+        */
+
+        const orderId = result && result.name
+            ? result.name
+            : "Saved";
+
+        const finalMessage =
+            `Order Reference: ${orderId}\n\n` + message;
+
+        const finalWhatsAppURL =
+            `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(finalMessage)}`;
+
+        if (whatsappWindow && !whatsappWindow.closed) {
+            whatsappWindow.location.href =
+                finalWhatsAppURL;
+        } else {
+            window.location.href = finalWhatsAppURL;
+        }
+
+        alert(
+            "Your order has been saved online. WhatsApp will open next to send your order."
+        );
+
+    } catch (error) {
+        console.error(
+            "Order could not be saved to Firebase:",
+            error
+        );
+
+        if (whatsappWindow && !whatsappWindow.closed) {
+            whatsappWindow.close();
+        }
+
+        const continueToWhatsApp = confirm(
+            "Your order could NOT be saved online. Do you still want to continue to WhatsApp? If you continue, the order may not appear in your website database."
+        );
+
+        if (continueToWhatsApp) {
+            window.location.href = whatsappURL;
+        }
+
+    } finally {
+        if (whatsappCheckoutBtn) {
+            whatsappCheckoutBtn.disabled = false;
+            whatsappCheckoutBtn.textContent =
+                "Order on WhatsApp";
+        }
+    }
 }
 
-
 /* =========================================================
-   QUICK WHATSAPP ORDER
+QUICK WHATSAPP ORDER
 ========================================================= */
 
 function quickWhatsAppOrder(productId) {
@@ -1512,16 +1655,27 @@ function quickWhatsAppOrder(productId) {
             .replace(/\D/g, "");
 
     if (!whatsappNumber) {
-        alert("Please set your WhatsApp number in Admin Settings.");
+        alert(
+            "Please set your WhatsApp number in Admin Settings."
+        );
         return;
     }
+
+    const images = getProductImages(product);
+
+    const imageText = images.length
+        ? images.map((url, index) =>
+            `Image ${index + 1}: ${url}`
+        ).join("\n")
+        : "Product image: Not available";
 
     const message =
         `*Quick Order - ${settings.storeName}*\n\n` +
         `Product: ${product.name}\n` +
-        `Category: ${product.category}\n` +
+        `Category: ${product.category || ""}\n` +
         `Price: Rs. ${Number(product.price).toLocaleString()}\n` +
-        `Available: ${stock}\n\n` +
+        `Available: ${stock}\n` +
+        `${imageText}\n\n` +
         `I would like to order this item. Please share further details.`;
 
     const whatsappURL =
@@ -1534,9 +1688,8 @@ function quickWhatsAppOrder(productId) {
     );
 }
 
-
 /* =========================================================
-   EVENT LISTENERS
+EVENT LISTENERS
 ========================================================= */
 
 function setupEventListeners() {
@@ -1571,7 +1724,6 @@ function setupEventListeners() {
         });
     }
 
-
     /* NAVIGATION FILTERS */
 
     document.querySelectorAll(".nav-link[data-filter]")
@@ -1594,7 +1746,6 @@ function setupEventListeners() {
                 }
             });
         });
-
 
     /* ADMIN TABS */
 
@@ -1620,10 +1771,7 @@ function setupEventListeners() {
         });
     });
 
-
-    /* =====================================================
-       CLOUDINARY MULTIPLE IMAGE UPLOAD
-    ===================================================== */
+    /* CLOUDINARY MULTIPLE IMAGE UPLOAD */
 
     if (prodImageFile) {
         prodImageFile.addEventListener("change", async e => {
@@ -1636,13 +1784,12 @@ function setupEventListeners() {
             }
 
             if (files.length > 4) {
-                alert("Maximum 4 images allowed per product.");
+                alert(
+                    "Maximum 4 images allowed per product."
+                );
             }
 
             const selectedFiles = files.slice(0, 4);
-
-            const previousButtonText =
-                saveProductBtn.textContent;
 
             try {
                 saveProductBtn.disabled = true;
@@ -1650,21 +1797,18 @@ function setupEventListeners() {
                 saveProductBtn.textContent =
                     "Uploading Images...";
 
-                // Compress images.
                 const compressedImages = await Promise.all(
                     selectedFiles.map(
                         file => compressImage(file)
                     )
                 );
 
-                // Upload to Cloudinary.
                 const uploadedURLs = await Promise.all(
                     compressedImages.map(
                         dataURL => uploadImageToCloudinary(dataURL)
                     )
                 );
 
-                // Save Cloudinary URLs in the existing hidden field.
                 prodImageBase64.value =
                     JSON.stringify(uploadedURLs);
 
@@ -1685,7 +1829,6 @@ function setupEventListeners() {
             } finally {
                 saveProductBtn.disabled = false;
 
-                // Keep the correct button label for edit mode.
                 saveProductBtn.textContent =
                     editProductId.value
                         ? "Update Product"
@@ -1693,7 +1836,6 @@ function setupEventListeners() {
             }
         });
     }
-
 
     /* SAVE PRODUCT */
 
@@ -1825,7 +1967,6 @@ function setupEventListeners() {
         });
     }
 
-
     /* CANCEL EDIT */
 
     if (cancelEditBtn) {
@@ -1834,7 +1975,6 @@ function setupEventListeners() {
             resetProductForm
         );
     }
-
 
     /* STORE SETTINGS */
 
@@ -1874,7 +2014,6 @@ function setupEventListeners() {
         });
     }
 
-
     /* CART BUTTONS */
 
     if (cartBtn) {
@@ -1895,7 +2034,6 @@ function setupEventListeners() {
             location.href = "#shop";
         });
     }
-
 
     /* MOBILE MENU */
 
@@ -1920,7 +2058,6 @@ function setupEventListeners() {
             });
         });
 
-
     /* WHATSAPP CHECKOUT */
 
     if (whatsappCheckoutBtn) {
@@ -1931,9 +2068,8 @@ function setupEventListeners() {
     }
 }
 
-
 /* =========================================================
-   PAGE INITIALIZATION
+PAGE INITIALIZATION
 ========================================================= */
 
 document.addEventListener("DOMContentLoaded", async () => {
